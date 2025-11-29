@@ -14,12 +14,12 @@ const GEM_BASES = {
 };
 
 const GEM_NAMES = [
-  "Stability",
-  "Solidity",
-  "Immutability",
-  "Corrosion",
-  "Distortion",
-  "Destruction",
+  "Order: Stability",
+  "Order: Solidity",
+  "Order: Immutability",
+  "Chaos: Corrosion",
+  "Chaos: Distortion",
+  "Chaos: Destruction",
 ];
 
 const RARITIES = ["Uncommon", "Rare", "Epic"];
