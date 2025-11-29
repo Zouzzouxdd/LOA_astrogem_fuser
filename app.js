@@ -102,7 +102,8 @@ function evaluatePattern(
 
   const { bucketRarity, bucketType, bucketWill } = meta;
 
-  // Rarity
+  // ---------- Rarity probabilities (game-accurate) ----------
+  // 1) Sum per-gem contributions
   let epicRaw = 0;
   let rareRaw = 0;
   for (let i = 0; i < counts.length; i += 1) {
@@ -113,10 +114,19 @@ function evaluatePattern(
     rareRaw += c * RARE_UPGRADE[r];
   }
 
-  const pEpic = Math.min(1.0, epicRaw);
-  const pRareIfNotEpic = Math.min(1.0, rareRaw);
-  const pRare = (1.0 - pEpic) * pRareIfNotEpic;
-  const pUncommon = 1.0 - pEpic - pRare;
+  // epicRaw and rareRaw are in [0, +), interpreted as probabilities in [0,1]
+  const pEpicRaw = epicRaw;
+  const pRareRaw = rareRaw;
+
+  // Epic chance is just the raw sum, clamped to 1 as a safety guard
+  const pEpic = Math.min(1.0, pEpicRaw);
+
+  // Uncommon is "whatever is left", clamped at 0
+  // pU = max(0, 1 - pE_raw - pR_raw)
+  const pUncommon = Math.max(0, 1.0 - pEpicRaw - pRareRaw);
+
+  // Rare gets the remaining mass: pR = 1 - pE - pU
+  const pRare = 1.0 - pEpic - pUncommon;
 
   const rarityProbs = {
     Uncommon: pUncommon,
@@ -127,34 +137,31 @@ function evaluatePattern(
   const pRarity =
     targetRarity == null ? 1.0 : (rarityProbs[targetRarity] || 0.0);
 
-  // Type
+  // ---------- Type inheritance ----------
   let pType = 1.0;
   if (targetType != null) {
     let typeMatches = 0;
     for (let i = 0; i < counts.length; i += 1) {
       const c = counts[i];
       if (!c) continue;
-      if (bucketType[i] === targetType) {
-        typeMatches += c;
-      }
+      if (bucketType[i] === targetType) typeMatches += c;
     }
-    pType = typeMatches / totalGems;
+    pType = typeMatches / totalGems; // totalGems = 3
   }
 
-  // Base will
+  // ---------- Base willpower inheritance ----------
   let pBase = 1.0;
   if (targetWill != null) {
     let baseMatches = 0;
     for (let i = 0; i < counts.length; i += 1) {
       const c = counts[i];
       if (!c) continue;
-      if (bucketWill[i] === targetWill) {
-        baseMatches += c;
-      }
+      if (bucketWill[i] === targetWill) baseMatches += c;
     }
-    pBase = baseMatches / totalGems;
+    pBase = baseMatches / totalGems; // totalGems = 3
   }
 
+  // Joint probability under independence assumption
   const score = pRarity * pType * pBase;
 
   return {
@@ -179,9 +186,9 @@ function bestFusionPatterns(
   const bucketKeys = getBucketKeys();
   const numBuckets = bucketKeys.length;
   const meta = buildBucketMeta(bucketKeys);
+  const { bucketType, bucketWill } = meta;
 
   const avail = new Array(numBuckets).fill(0);
-  const { bucketType, bucketWill, bucketRarity } = meta;
 
   for (let i = 0; i < numBuckets; i += 1) {
     const { rarity, name } = bucketKeys[i];
@@ -189,7 +196,7 @@ function bestFusionPatterns(
     const q = quantities[key] || 0;
     let a = Math.min(q, 3);
 
-    // Don't use target-or-better gems in same slot
+    // Exclude target-or-better gems in same slot
     if (
       bucketType[i] === targetType &&
       bucketWill[i] === targetWill &&
@@ -258,11 +265,8 @@ function patternToLabels(counts, bucketKeys) {
     const c = counts[i];
     if (!c) continue;
     const { rarity, name } = bucketKeys[i];
-    if (c === 1) {
-      labels.push(`${rarity} ${name}`);
-    } else {
-      labels.push(`${c}x ${rarity} ${name}`);
-    }
+    if (c === 1) labels.push(`${rarity} ${name}`);
+    else labels.push(`${c}x ${rarity} ${name}`);
   }
   return labels;
 }
@@ -284,6 +288,7 @@ function buildInventoryTable() {
   for (const rarity of RARITIES) {
     for (const name of GEM_NAMES) {
       const tr = document.createElement("tr");
+      tr.classList.add("rarity-row", `rarity-row-${rarity}`);
 
       const tdR = document.createElement("td");
       tdR.textContent = rarity;
@@ -295,6 +300,14 @@ function buildInventoryTable() {
       tr.appendChild(tdN);
 
       const tdQ = document.createElement("td");
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("qty-wrapper");
+
+      const decBtn = document.createElement("button");
+      decBtn.type = "button";
+      decBtn.textContent = "−";
+      decBtn.classList.add("qty-btn", "qty-btn-dec");
+
       const input = document.createElement("input");
       input.type = "number";
       input.min = "0";
@@ -303,7 +316,17 @@ function buildInventoryTable() {
       input.classList.add("quantity-input");
       input.dataset.rarity = rarity;
       input.dataset.name = name;
-      tdQ.appendChild(input);
+
+      const incBtn = document.createElement("button");
+      incBtn.type = "button";
+      incBtn.textContent = "+";
+      incBtn.classList.add("qty-btn", "qty-btn-inc");
+
+      wrapper.appendChild(decBtn);
+      wrapper.appendChild(input);
+      wrapper.appendChild(incBtn);
+
+      tdQ.appendChild(wrapper);
       tr.appendChild(tdQ);
 
       tbody.appendChild(tr);
@@ -415,7 +438,30 @@ document.addEventListener("DOMContentLoaded", () => {
   buildInventoryTable();
 
   const runBtn = document.getElementById("run-btn");
-  if (runBtn) {
-    runBtn.addEventListener("click", runCalculator);
+  if (runBtn) runBtn.addEventListener("click", runCalculator);
+
+  // + / − buttons (event delegation)
+  const invTable = document.getElementById("inventory-table");
+  if (invTable) {
+    invTable.addEventListener("click", (e) => {
+      const btn = e.target.closest(".qty-btn");
+      if (!btn) return;
+
+      const wrapper = btn.closest(".qty-wrapper");
+      if (!wrapper) return;
+      const input = wrapper.querySelector(".quantity-input");
+      if (!input) return;
+
+      let val = parseInt(input.value, 10);
+      if (!Number.isFinite(val) || val < 0) val = 0;
+
+      if (btn.classList.contains("qty-btn-inc")) {
+        val += 1;
+      } else if (btn.classList.contains("qty-btn-dec")) {
+        val = Math.max(0, val - 1);
+      }
+
+      input.value = String(val);
+    });
   }
 });

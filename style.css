@@ -7,11 +7,10 @@
   --text: #f3f3f3;
   --muted: #a0a4b0;
   --accent: #3b82f6;
-  --danger: #f97373;
 
   --rarity-uncommon: #9acd32; /* green */
   --rarity-rare: #38bdf8;     /* blue  */
-  --rarity-epic: #c084fc;     /* purple */
+  --rarity-epic: #6903cf;     /* purple */
 }
 
 *,
@@ -55,7 +54,6 @@ main {
   grid-gap: 1.5rem;
 }
 
-/* NEW: stack right column content (target above results) */
 #right-column {
   display: flex;
   flex-direction: column;
@@ -68,7 +66,8 @@ main {
   }
 }
 
-/* Panels: now include #target as a card too */
+/* Panels */
+
 #inputs,
 #target,
 #results {
@@ -97,11 +96,13 @@ thead tr {
   background: var(--bg-alt);
 }
 
-tbody tr:nth-child(odd) {
+/* Results table zebra striping only */
+
+#results-table tbody tr:nth-child(odd) {
   background: rgba(24, 27, 34, 0.85);
 }
 
-tbody tr:nth-child(even) {
+#results-table tbody tr:nth-child(even) {
   background: rgba(16, 18, 25, 0.85);
 }
 
@@ -109,6 +110,39 @@ tbody tr:nth-child(even) {
 
 #inventory-table {
   margin-top: 0.5rem;
+}
+
+/* Rarity gradient rows for inventory */
+
+#inventory-table tbody tr {
+  background: transparent;
+}
+
+.rarity-row-Uncommon {
+  background: linear-gradient(
+    90deg,
+    rgba(154, 205, 50, 0.30) 0%,
+    rgba(154, 205, 50, 0.13) 35%,
+    rgba(12, 14, 20, 0.98) 100%
+  );
+}
+
+.rarity-row-Rare {
+  background: linear-gradient(
+    90deg,
+    rgba(56, 189, 248, 0.30) 0%,
+    rgba(56, 189, 248, 0.13) 35%,
+    rgba(12, 14, 20, 0.98) 100%
+  );
+}
+
+.rarity-row-Epic {
+  background: linear-gradient(
+    90deg,
+    rgba(192, 132, 252, 0.32) 0%,
+    rgba(192, 132, 252, 0.15) 35%,
+    rgba(12, 14, 20, 0.98) 100%
+  );
 }
 
 /* Inputs */
@@ -131,13 +165,45 @@ select:focus {
 }
 
 input[type="number"] {
-  width: 4rem;
+  width: 3.5rem;
+}
+
+/* Quantity +/− controls */
+
+.qty-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.qty-btn {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  border: 1px solid #3b3f4d;
+  background: #090b10;
+  color: #e5e7eb;
+  font-size: 1rem;
+  line-height: 1rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.qty-btn:hover {
+  background: #11141d;
+}
+
+.qty-btn:active {
+  transform: translateY(1px);
 }
 
 /* Target controls */
 
 #target {
-  margin-top: 0;            /* no extra top gap in its card */
+  margin-top: 0;
   padding-top: 1rem;
 }
 
@@ -177,7 +243,7 @@ input[type="number"] {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.7);
 }
 
-/* Rarity coloring */
+/* Rarity text colouring */
 
 .rarity-Uncommon {
   color: var(--rarity-uncommon);
@@ -191,7 +257,7 @@ input[type="number"] {
   color: var(--rarity-epic);
 }
 
-/* Results table */
+/* Results table layout */
 
 #results-table th:nth-child(1),
 #results-table td:nth-child(1) {
@@ -202,15 +268,11 @@ input[type="number"] {
   min-width: 10rem;
 }
 
-/* Empty-state row */
-
 #results-table tbody td[colspan] {
   text-align: center;
   padding: 0.75rem 0.5rem;
   color: var(--muted);
 }
-
-/* Small probability text alignment */
 
 #results-table td:nth-child(3),
 #results-table td:nth-child(4),
