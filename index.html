@@ -14,6 +14,7 @@
   </header>
 
   <main>
+    <!-- LEFT: Inventory only -->
     <section id="inputs">
       <h2>Inventory</h2>
 
@@ -29,7 +30,10 @@
           <!-- Filled by app.js (18 rows: Uncommon/Rare/Epic × 6 names) -->
         </tbody>
       </table>
+    </section>
 
+    <!-- RIGHT: Target controls on top, results under -->
+    <section id="right-column">
       <section id="target">
         <h2>Target Gem</h2>
 
@@ -61,25 +65,25 @@
 
         <button id="run-btn">Calculate best fusions</button>
       </section>
-    </section>
 
-    <section id="results">
-      <h2>Best Fusion Patterns</h2>
-      <table id="results-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Pattern</th>
-            <th>P(target rarity)</th>
-            <th>P(target type)</th>
-            <th>P(target base)</th>
-            <th>P(target gem)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Filled by app.js -->
-        </tbody>
-      </table>
+      <section id="results">
+        <h2>Best Fusion Patterns</h2>
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Pattern</th>
+              <th>P(target rarity)</th>
+              <th>P(target type)</th>
+              <th>P(target base)</th>
+              <th>P(target gem)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Filled by app.js -->
+          </tbody>
+        </table>
+      </section>
     </section>
   </main>
 </body>

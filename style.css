@@ -55,15 +55,23 @@ main {
   grid-gap: 1.5rem;
 }
 
+/* NEW: stack right column content (target above results) */
+#right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 @media (max-width: 900px) {
   main {
     grid-template-columns: 1fr;
   }
 }
 
-/* Panels */
-
-#inputs, #results {
+/* Panels: now include #target as a card too */
+#inputs,
+#target,
+#results {
   background: rgba(12, 14, 20, 0.96);
   border-radius: 0.75rem;
   border: 1px solid var(--border);
@@ -129,9 +137,8 @@ input[type="number"] {
 /* Target controls */
 
 #target {
-  margin-top: 1.25rem;
+  margin-top: 0;            /* no extra top gap in its card */
   padding-top: 1rem;
-  border-top: 1px dashed var(--border);
 }
 
 .target-row {
