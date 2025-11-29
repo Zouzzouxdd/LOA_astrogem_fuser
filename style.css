@@ -10,7 +10,7 @@
 
   --rarity-uncommon: #9acd32; /* green */
   --rarity-rare: #38bdf8;     /* blue  */
-  --rarity-epic: #6903cf;     /* purple */
+  --rarity-epic: #c084fc;     /* purple */
 }
 
 *,
@@ -86,7 +86,8 @@ table {
   font-size: 0.9rem;
 }
 
-th, td {
+th,
+td {
   padding: 0.45rem 0.55rem;
   text-align: left;
   border-bottom: 1px solid var(--border);
@@ -96,7 +97,7 @@ thead tr {
   background: var(--bg-alt);
 }
 
-/* Results table zebra striping only */
+/* RESULTS TABLE: zebra striping (no gradients) */
 
 #results-table tbody tr:nth-child(odd) {
   background: rgba(24, 27, 34, 0.85);
@@ -106,43 +107,76 @@ thead tr {
   background: rgba(16, 18, 25, 0.85);
 }
 
-/* Inventory table specifics */
+/* INVENTORY TABLE */
 
 #inventory-table {
   margin-top: 0.5rem;
 }
 
-/* Rarity gradient rows for inventory */
+/* Base zebra striping for inventory, then overlay rarity gradient via CSS variable */
 
 #inventory-table tbody tr {
-  background: transparent;
+  /* default so we can layer gradient on top via multiple backgrounds */
+  background: rgba(16, 18, 25, 0.9);
 }
 
+#inventory-table tbody tr:nth-child(odd) {
+  background: rgba(24, 27, 34, 0.9);
+}
+
+/* Each rarity row sets a color variable used in the gradient */
+.rarity-row {
+  --row-rarity-color: rgba(0, 0, 0, 0);
+}
+
+/* Uncommon: green tint on left fading out */
 .rarity-row-Uncommon {
-  background: linear-gradient(
-    90deg,
-    rgba(154, 205, 50, 0.30) 0%,
-    rgba(154, 205, 50, 0.13) 35%,
-    rgba(12, 14, 20, 0.98) 100%
-  );
+  --row-rarity-color: rgba(153, 205, 50, 0.293);
 }
 
+/* Rare: blue tint on left fading out */
 .rarity-row-Rare {
-  background: linear-gradient(
-    90deg,
-    rgba(56, 189, 248, 0.30) 0%,
-    rgba(56, 189, 248, 0.13) 35%,
-    rgba(12, 14, 20, 0.98) 100%
-  );
+  --row-rarity-color: rgba(56, 189, 248, 0.4);
 }
 
+/* Epic: purple tint on left fading out */
 .rarity-row-Epic {
-  background: linear-gradient(
-    90deg,
-    rgba(192, 132, 252, 0.32) 0%,
-    rgba(192, 132, 252, 0.15) 35%,
-    rgba(12, 14, 20, 0.98) 100%
-  );
+  --row-rarity-color: rgba(163, 71, 255, 0.37);
+}
+
+/* Combine zebra + gradient using multiple backgrounds */
+
+#inventory-table tbody tr.rarity-row:nth-child(odd),
+#inventory-table tbody tr.rarity-row:nth-child(even) {
+  background:
+    linear-gradient(
+      90deg,
+      var(--row-rarity-color) 0%,
+      rgba(0, 0, 0, 0) 33%
+    ),
+    /* base zebra layer, depends on odd/even */
+    transparent;
+}
+
+/* Explicitly set base layer for odd/even so we keep banding */
+#inventory-table tbody tr.rarity-row:nth-child(odd) {
+  background:
+    linear-gradient(
+      90deg,
+      var(--row-rarity-color) 0%,
+      rgba(0, 0, 0, 0) 33%
+    ),
+    rgba(24, 27, 34, 0.9);
+}
+
+#inventory-table tbody tr.rarity-row:nth-child(even) {
+  background:
+    linear-gradient(
+      90deg,
+      var(--row-rarity-color) 0%,
+      rgba(0, 0, 0, 0) 33%
+    ),
+    rgba(16, 18, 25, 0.9);
 }
 
 /* Inputs */

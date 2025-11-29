@@ -134,8 +134,21 @@ function evaluatePattern(
     Epic: pEpic,
   };
 
-  const pRarity =
-    targetRarity == null ? 1.0 : (rarityProbs[targetRarity] || 0.0);
+  // P(rarity >= target rarity)
+  let pRarity;
+  if (targetRarity == null) {
+    pRarity = 1.0;
+  } else if (targetRarity === "Uncommon") {
+    // Uncommon or higher is always 1 by definition
+    pRarity = rarityProbs.Uncommon + rarityProbs.Rare + rarityProbs.Epic;
+  } else if (targetRarity === "Rare") {
+    pRarity = rarityProbs.Rare + rarityProbs.Epic;
+  } else if (targetRarity === "Epic") {
+    pRarity = rarityProbs.Epic;
+  } else {
+    pRarity = 0.0;
+  }
+
 
   // ---------- Type inheritance ----------
   let pType = 1.0;
