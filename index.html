@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Astrogem Fusion Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <h1>Astrogem Fusion Calculator</h1>
+    <p>Enter your astrogem inventory and choose a target gem to see the best fusion patterns.</p>
+  </header>
+
+  <main>
+    <section id="inputs">
+      <h2>Inventory</h2>
+
+      <table id="inventory-table">
+        <thead>
+          <tr>
+            <th>Rarity</th>
+            <th>Gem</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled by app.js (18 rows: Uncommon/Rare/Epic × 6 names) -->
+        </tbody>
+      </table>
+
+      <section id="target">
+        <h2>Target Gem</h2>
+
+        <div class="target-row">
+          <label for="target-rarity">Rarity</label>
+          <select id="target-rarity">
+            <option value="Uncommon">Uncommon</option>
+            <option value="Rare" selected>Rare</option>
+            <option value="Epic">Epic</option>
+          </select>
+        </div>
+
+        <div class="target-row">
+          <label for="target-name">Name</label>
+          <select id="target-name">
+            <option value="Stability">Stability</option>
+            <option value="Solidity">Solidity</option>
+            <option value="Immutability">Immutability</option>
+            <option value="Corrosion">Corrosion</option>
+            <option value="Distortion">Distortion</option>
+            <option value="Destruction">Destruction</option>
+          </select>
+        </div>
+
+        <div class="target-row">
+          <label for="top-n">Top N patterns</label>
+          <input id="top-n" type="number" value="20" min="1" max="200">
+        </div>
+
+        <button id="run-btn">Calculate best fusions</button>
+      </section>
+    </section>
+
+    <section id="results">
+      <h2>Best Fusion Patterns</h2>
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Pattern</th>
+            <th>P(target rarity)</th>
+            <th>P(target type)</th>
+            <th>P(target base)</th>
+            <th>P(target gem)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filled by app.js -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
